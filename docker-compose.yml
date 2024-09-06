@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  fileuploadapp:
+    build: .
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./uploads:/app/uploads
+    container_name: fileuploadapp
