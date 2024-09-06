@@ -69,6 +69,7 @@ func uploadPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	htmlContent := `
 	<!DOCTYPE html>
+	<!-- 1 -->
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">
@@ -215,19 +216,34 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if r.Method == http.MethodOptions {
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	InitializeTOTPSecret()
+	fmt.Println("Images URL:", imagesUrl)
 
 	if err := os.MkdirAll(UPLOAD_DIR, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
 
-	http.HandleFunc("/", uploadPageHandler)
-	http.HandleFunc("/upload", uploadFileHandler)
-	fmt.Println("Images URL:", imagesUrl)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", uploadPageHandler)
+	mux.HandleFunc("/upload", uploadFileHandler)
+
+	handler := corsMiddleware(mux)
 
 	fmt.Println("Starting server at :8086")
-	if err := http.ListenAndServe(":8086", nil); err != nil {
+	if err := http.ListenAndServe(":8086", handler); err != nil {
 		log.Fatal(err)
 	}
 }
