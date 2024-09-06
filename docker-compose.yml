@@ -1,13 +1,13 @@
 
 services:
   image-uploader:
-    image: savarez/image-uploader:latest
-#    build: .
+#    image: savarez/image-uploader:latest
+    build: .
     ports:
       - "8086:8086"
     environment:
       - IMAGES_URL=http://localhost:8080/images
     volumes:
       - ./uploads:/app/uploads
-      - ./totp_secret:/app/totp_secret
+      - ./secrets:/app/secrets
     container_name: image-uploader

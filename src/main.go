@@ -15,7 +15,7 @@ import (
 
 const (
 	MAX_UPLOAD_SIZE  = 10 * 1024 * 1024
-	TOTP_SECRET_FILE = "totp_secret"
+	TOTP_SECRET_FILE = "secrets/totp_secret"
 	UPLOAD_DIR       = "uploads"
 )
 

@@ -12,21 +12,15 @@ services:
         - IMAGES_URL=https://yourhostname/images
     volumes:
       - ./uploads:/app/uploads
-      - ./totp_secret:/app/totp_secret
+      - ./secrets:/app/secrets
     container_name: image-uploader
 ```
 
 
-First run:
-
-```bash
-docker pull savarez/image-uploader:latest
-docker-compose up
-```
-On first run TOTP secret will be generated and shown
-
-If everything is ok, the container can be started in background:
+Run:
 
 ```bash
 docker-compose up -d
 ```
+
+file with TOTP secret should be created in secrets folder.
