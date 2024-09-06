@@ -21,6 +21,8 @@ const (
 
 var totpSecret string
 
+var imagesUrl = os.Getenv("IMAGES_URL")
+
 // UploadResponse is the structure of the JSON response for uploads
 type UploadResponse struct {
 	Filename string `json:"filename"`
@@ -60,15 +62,10 @@ func InitializeTOTPSecret() {
 		}
 		fmt.Println("Loaded TOTP secret from file.")
 	}
-
-	fmt.Println("TOTP secret:", totpSecret)
 }
 
 // Serve the HTML page for file upload
 func uploadPageHandler(w http.ResponseWriter, r *http.Request) {
-
-	imagesUrl := os.Getenv("IMAGES_URL")
-	fmt.Println("Images URL:", imagesUrl)
 
 	htmlContent := `
 	<!DOCTYPE html>
@@ -227,6 +224,7 @@ func main() {
 
 	http.HandleFunc("/", uploadPageHandler)
 	http.HandleFunc("/upload", uploadFileHandler)
+	fmt.Println("Images URL:", imagesUrl)
 
 	fmt.Println("Starting server at :8086")
 	if err := http.ListenAndServe(":8086", nil); err != nil {

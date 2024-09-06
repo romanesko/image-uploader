@@ -8,21 +8,20 @@ services:
     image: savarez/image-uploader:latest
     ports:
       - "8086:8086"
+    environment:
+        - IMAGES_URL=https://yourhostname/images
     volumes:
       - ./uploads:/app/uploads
+      - ./totp_secret:/app/totp_secret
     container_name: image-uploader
 ```
 
-and folder 'uploads' must exist.
-
-```bash
-mkdir uploads
-```
 
 First run:
 
 ```bash
-docker-compose up --build
+docker pull savarez/image-uploader:latest
+docker-compose up
 ```
 On first run TOTP secret will be generated and shown
 
