@@ -15,7 +15,7 @@ import (
 
 const (
 	MAX_UPLOAD_SIZE  = 10 * 1024 * 1024
-	TOTP_SECRET_FILE = "totp_secret.txt"
+	TOTP_SECRET_FILE = "totp_secret"
 	UPLOAD_DIR       = "uploads"
 )
 
@@ -60,10 +60,16 @@ func InitializeTOTPSecret() {
 		}
 		fmt.Println("Loaded TOTP secret from file.")
 	}
+
+	fmt.Println("TOTP secret:", totpSecret)
 }
 
 // Serve the HTML page for file upload
 func uploadPageHandler(w http.ResponseWriter, r *http.Request) {
+
+	imagesUrl := os.Getenv("IMAGES_URL")
+	fmt.Println("Images URL:", imagesUrl)
+
 	htmlContent := `
 	<!DOCTYPE html>
 	<html lang="en">
@@ -72,12 +78,17 @@ func uploadPageHandler(w http.ResponseWriter, r *http.Request) {
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Image Upload with TOTP</title>
  		<script src="https://cdnjs.cloudflare.com/ajax/libs/otpauth/9.3.2/otpauth.umd.min.js"></script>
+		<style>
+			body { background-color: #f0f0f0; padding: 20px; margin: 0; }
+			* {    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Vazirmatn, Courier New, monospace; font-feature-settings: normal; font-variation-settings: normal;}
+
+		</style>
 	</head>
 	<body>
-		<h1>Upload Image (with TOTP)</h1>
+		<h1>Upload Image</h1>
 		<label for="fileInput">Choose Image:</label>
-		<input type="file" id="fileInput" accept="image/*"><br>
-		<button id="uploadButton">Upload</button>
+		<input type="file" id="fileInput" accept="image/*">
+		<div><button id="uploadButton">Upload</button></div>
 		<p id="responseMessage"></p>
 
 		<script>
@@ -102,9 +113,9 @@ func uploadPageHandler(w http.ResponseWriter, r *http.Request) {
 						});
 						const result = await response.json();
 						if (response.ok) {
-							document.getElementById('responseMessage').innerText = "Upload successful: " + result.filename;
+							document.getElementById('responseMessage').innerHTML = "Upload successful: <a href='%s/"+ result.filename +"'>" + result.filename + "</a>";
 						} else {
-							document.getElementById('responseMessage').innerText = "Upload failed: " + result.message;
+							document.getElementById('responseMessage').innerText = "Upload failed:" + result.message;
 						}
 					} catch (err) {
 						document.getElementById('responseMessage').innerText = "Error: " + err.message;
@@ -114,7 +125,7 @@ func uploadPageHandler(w http.ResponseWriter, r *http.Request) {
 		</script>
 	</body>
 	</html>`
-	fmt.Fprint(w, htmlContent)
+	fmt.Fprint(w, fmt.Sprintf(htmlContent, imagesUrl))
 }
 
 func ValidateTOTP(token string) bool {
